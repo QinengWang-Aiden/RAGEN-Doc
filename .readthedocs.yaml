@@ -1,13 +1,15 @@
-version: "2"
+# .readthedocs.yaml
+version: 2  # Using the latest version 2 configuration format
 
 build:
-  os: "ubuntu-22.04"
+  os: ubuntu-24.04
   tools:
-    python: "3.10"
+    python: "3.10"  # Recommended to use 3.10, since you were using Python 3.10 environment
+
+mkdocs:
+  configuration: mkdocs.yml
+  fail_on_warning: true  # Adding this option ensures build quality
 
 python:
   install:
-    - requirements: docs/requirements.txt
-
-sphinx:
-  configuration: docs/source/conf.py
+    - requirements: requirements/requirements.txt
