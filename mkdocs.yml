@@ -36,6 +36,7 @@ nav:
     - Quick Start Guide: quickstart/quick_start.md
   - Configurations:
     - Config Explanation: configurations/config_exp.md
+    - Practical Usage Config Flow: configurations/config_flow.md
   - Practical Guide:
     - Best Practices: practical_guide/best_practices.md
     - Examples:
@@ -71,7 +72,11 @@ markdown_extensions:
   - pymdownx.snippets:
       base_path: .
       check_paths: true
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.details
   - pymdownx.tasklist:
       custom_checkbox: true
