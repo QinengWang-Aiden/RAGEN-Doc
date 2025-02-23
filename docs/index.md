@@ -1,18 +1,14 @@
 # Welcome to RAGEN's Tutorial!
 
-**RAGEN** (Reinforcement learning AGENt) is the first reproduction of the **DeepSeek-R1(-Zero)** methods for *training agentic models*.
-
-*We strongly believe in the future of RL + LLM + Agents. The release is a minimally viable leap forward.*
-
 ## 🚀 Introduction
 
-RAGEN is designed to [brief description of main purpose and unique features]. Our framework enables [key capabilities/benefits].
+**RAGEN** (Reinforcement learning AGENt) is the first reproduction of the **DeepSeek-R1(-Zero)** framework for *training agentic models* building on top of [`verl`](https://github.com/volcengine/verl).
 
 ### Key Features
 
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
+- Feature 1: Support multiple RL algorithms, including PPO, GRPO and BRPO.
+- Feature 2: Support multi-turn online RL training for agentic models.
+- Feature 3: Easy to be extended to any other [Gym](https://gymnasium.farama.org/) environments.
 
 ## 📚 Documentation Structure
 
@@ -36,13 +32,23 @@ RAGEN is designed to [brief description of main purpose and unique features]. Ou
 
 We welcome contributions! Whether you're fixing bugs, adding new features, or improving documentation, please feel free to make a pull request.
 
+## 📖 Citation
+
+If you find RAGEN helpful in your research/project, please feel free to cite our work using:
+
+```bibtex
+@misc{RAGEN,
+  author       = {Zihan Wang and Kangrui Wang and Qineng Wang and Pingyue Zhang and Manling Li},
+  title        = {RAGEN: A General-Purpose Reasoning Agent Training Framework},
+  year         = {2025},
+  organization = {GitHub},
+  url          = {https://github.com/ZihanWang314/ragen},
+}
+```
+
 ## 📝 License
 
-[License information]
-
-## 📮 Contact
-
-[Contact information]
+This project is under Apache-2.0 license.
 
 ---
 
