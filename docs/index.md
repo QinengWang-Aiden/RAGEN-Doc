@@ -22,6 +22,7 @@ RAGEN is designed to [brief description of main purpose and unique features]. Ou
 
 ### Configurations
 - [Config Explanation](configurations/config_exp.md): Understanding RAGEN's configuration system
+- [Practical Usage Config Flow](configurations/config_flow.md): Understand how configs are passed from command lines to the training script
 
 ### Practical Guide
 - [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
