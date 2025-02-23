@@ -28,9 +28,9 @@ RAGEN is designed to [brief description of main purpose and unique features]. Ou
 - [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
 
 #### Examples
+- [Sokoban](practical_guide/examples/sokoban.md): Complex puzzle environment
 - [Bi-arm Bandit](practical_guide/examples/bi_arm_bandit.md): Classic exploration vs exploitation
 - [FrozenLake](practical_guide/examples/frozenlake.md): Grid-world environment example
-- [Sokoban](practical_guide/examples/sokoban.md): Complex puzzle environment
 
 ## 🤝 Contributing
 
