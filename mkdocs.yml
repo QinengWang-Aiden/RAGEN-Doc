@@ -1,34 +1,47 @@
-site_name: RAGEN Tutorials
+site_name: RAGEN
 site_url: https://ragen-tutorial.readthedocs.io/
 copyright: Copyright © 2025, RAGEN Team
+
 # Theme Configuration
 theme:
   name: material
   features:
     - navigation.instant
     - navigation.tracking
-    - navigation.tabs
-    - navigation.sections
+    - navigation.expand
+    # - navigation.sections
     - toc.follow
     - search.suggest
     - search.highlight
+    - toc.integrate
+    - content.code.copy
   palette:
     - scheme: default
-      primary: indigo
-      accent: indigo
+      primary: teal
+      accent: pink
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: teal
+      accent: pink
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
 
 nav:
- - Home: index.md
-#  - Getting Started: usage.md
+  - Home: index.md
+  - Quick Start:
+    - Installation: quickstart/installation.md
+    - Quick Start Guide: quickstart/quick_start.md
+  - Configurations:
+    - Config Explanation: configurations/config_exp.md
+  - Practical Guide:
+    - Best Practices: practical_guide/best_practices.md
+    - Examples:
+      - Sokoban: practical_guide/examples/sokoban.md
+      - Bi-arm Bandit: practical_guide/examples/bi_arm_bandit.md
+      - FrozenLake: practical_guide/examples/frozenlake.md
 
 # Plugin Configuration
 plugins:
@@ -63,7 +76,6 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
 
-# # Additional Configuration
-repo_url: "https://github.com/ZihanWang314/RAGEN"  # Set to repository URL if you have a GitHub repository
-repo_name: RAGEN  # Set display name if repo_url is set
-# version: 0.1.0
+# Additional Configuration
+repo_url: "https://github.com/ZihanWang314/RAGEN"
+repo_name: RAGEN
