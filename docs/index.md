@@ -22,7 +22,6 @@ RAGEN is designed to [brief description of main purpose and unique features]. Ou
 
 ### Configurations
 - [Config Explanation](configurations/config_exp.md): Understanding RAGEN's configuration system
-- [YAML Guide](configurations/yaml_guide.md): Detailed guide for YAML configuration
 
 ### Practical Guide
 - [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
