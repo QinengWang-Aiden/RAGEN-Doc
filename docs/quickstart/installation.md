@@ -5,7 +5,7 @@
 
 ## Install
 ### Install from script (quickest)
-We provide a script to install RAGEN on **Linux**. This script will install all the dependencies and set up the **Conda** environment for you.
+We provide a script to install `RAGEN` on **Linux**. This script will install all the dependencies and set up the **Conda** environment for you.
 ```bash
 # Clone the repository
 git clone https://github.com/ZihanWang314/RAGEN.git
@@ -55,9 +55,24 @@ To be added in the future.
 To be added in the future.
 
 ## Dataset
-If you would like to test on our agent environments ([Sokoban](../practical_guide/examples/sokoban.md), [bi-arm bandit](../practical_guide/examples/bi_arm_bandit.md), [frozenlake](../practical_guide/examples/frozenlake.md)), please also run the following command to download the dataset (~ 7MB):
+If you would like to test on our agent environments ([Sokoban](../practical_guide/examples/sokoban.md), [Bi-arm bandit](../practical_guide/examples/bi_arm_bandit.md), [frozenlake](../practical_guide/examples/frozenlake.md)), you can either download the dataset from our repository or prepare using our script.
+### Download the dataset
+You can run the following command to download the dataset (~ 7MB):
 ```bash
 # Download the dataset
 # This will download the dataset to the `data` directory
 python scripts/download_dataset.py
+```
+### Prepare your own dataset
+We provide a script to prepare your own dataset. You can use the following command to prepare the dataset:
+```bash
+# Prepare the dataset
+# This will prepare the dataset in the `data` directory
+python scripts/create_data.sh
+```
+For better customization, you can also use the following command to prepare the full dataset:
+```bash
+# Prepare the dataset
+# This will prepare the dataset in the `data` directory
+python scripts/create_data_full.sh
 ```

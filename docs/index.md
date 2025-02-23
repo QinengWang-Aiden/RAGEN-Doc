@@ -21,7 +21,7 @@ RAGEN is designed to [brief description of main purpose and unique features]. Ou
 - [Quick Start Guide](quickstart/quick_start.md): Your first steps with RAGEN
 
 ### Configurations
-- [Configuration Flow](configurations/config_flow.md): Understanding RAGEN's configuration system
+- [Config Explanation](configurations/config_exp.md): Understanding RAGEN's configuration system
 - [YAML Guide](configurations/yaml_guide.md): Detailed guide for YAML configuration
 
 ### Practical Guide
