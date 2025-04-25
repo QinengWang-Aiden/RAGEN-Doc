@@ -2,7 +2,7 @@
 
 ## 🚀 Introduction
 
-**RAGEN** (Reinforcement learning AGENt) is the a reproduction of the **DeepSeek-R1(-Zero)** framework for *training agentic models* building on top of [`verl`](https://github.com/volcengine/verl).
+**RAGEN** (Reinforcement learning AGENt) is a reproduction of the **DeepSeek-R1(-Zero)** framework for *training agentic models* building on top of [`verl`](https://github.com/volcengine/verl).
 
 ### Key Features
 
