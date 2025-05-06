@@ -6,7 +6,7 @@
 
 ### Key Features
 
-- Feature 1: Support multiple RL algorithms, including PPO, GRPO and BRPO.
+- Feature 1: Support multiple RL algorithms, including PPO and GRPO.
 - Feature 2: Support multi-turn online RL training for agentic models.
 - Feature 3: Easy to be extended to any other [Gym](https://gymnasium.farama.org/) environments.
 
@@ -20,13 +20,13 @@
 - [Quick Start Guide](quickstart/quick_start.md): Your first steps with RAGEN
 
 ### Configurations
-- [Practical Usage Config Flow](configurations/config_flow.md): Understand how configs are passed from command lines to the training script
+<!-- - [Practical Usage Config Flow](configurations/config_flow.md): Understand how configs are passed from command lines to the training script -->
 - [Config Explanation](configurations/config_exp1.md): Understanding RAGEN's configuration system
 
 
 ### Practical Guide
 - [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
-- [FAQ](practical_guide/faq.md): Frequently asked questions and solutions
+- [FAQ](practical_guide/faq.md): Frequently asked questions
 
 #### Examples
 - [Sokoban](practical_guide/examples/sokoban.md): Complex puzzle environment
@@ -45,12 +45,14 @@ We welcome contributions! Whether you're fixing bugs, adding new features, or im
 If you find RAGEN helpful in your research/project, please feel free to cite our work using:
 
 ```bibtex
-@misc{RAGEN,
-  author       = {Zihan Wang and Kangrui Wang and Qineng Wang and Pingyue Zhang and Manling Li},
-  title        = {RAGEN: A General-Purpose Reasoning Agent Training Framework},
-  year         = {2025},
-  organization = {GitHub},
-  url          = {https://github.com/ZihanWang314/ragen},
+@misc{ragen,
+      title={RAGEN: Understanding Self-Evolution in LLM Agents via Multi-Turn Reinforcement Learning}, 
+      author={Zihan Wang and Kangrui Wang and Qineng Wang and Pingyue Zhang and Linjie Li and Zhengyuan Yang and Kefan Yu and Minh Nhat Nguyen and Licheng Liu and Eli Gottlieb and Monica Lam and Yiping Lu and Kyunghyun Cho and Jiajun Wu and Li Fei-Fei and Lijuan Wang and Yejin Choi and Manling Li},
+      year={2025},
+      eprint={2504.20073},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2504.20073}, 
 }
 ```
 

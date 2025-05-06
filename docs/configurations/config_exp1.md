@@ -323,3 +323,73 @@ trainer:
 ```
 
 These files only override a few parameters specific to the environment.
+
+## Custom Environment Configuration (`envs.yaml`)
+
+The `envs.yaml` file defines custom environments that can be used in training. Here's an example of how to configure different environments:
+
+```yaml
+custom_envs:
+  SimpleSokoban:
+    env_type: sokoban
+    max_actions_per_traj: 10  # Maximum actions allowed per trajectory
+    env_instruction: "You are solving the Sokoban puzzle. You are the player and you need to push all boxes to targets. When you are right next to a box, you can push it by moving in the same direction. You cannot push a box through a wall, and you cannot pull a box. The answer should be a sequence of actions, like <answer>Right || Right || Up</answer>"
+    max_tokens: 100  # Maximum tokens for LLM prompt
+    env_config:  # Environment-specific configuration
+      dim_x: 6
+      dim_y: 6
+      num_boxes: 1
+      max_steps: 100
+
+  FrozenLake:
+    env_type: frozen_lake
+    max_actions_per_traj: 10
+    env_instruction: "You are solving the FrozenLake puzzle. Forbid the whole and go to the target. You may move to the unintended direction due to the slippery ice. Example answer format: <think>To forbid the hole and go to the target, I should go left then go up.</think><answer>Left || Up</answer>"
+    max_tokens: 100
+    env_config: null
+```
+
+### Key Configuration Parameters
+
+#### Common Parameters
+- `env_type`: The type of environment (e.g., sokoban, frozen_lake, webshop)
+- `max_actions_per_traj`: Maximum number of actions allowed in a single trajectory
+- `env_instruction`: Instructions for the LLM agent
+- `max_tokens`: Maximum token length for the LLM prompt
+- `env_config`: Environment-specific settings
+
+#### Environment-Specific Configurations
+
+##### Sokoban Environment
+```yaml
+env_config:
+  dim_x: 6  # Width of the grid
+  dim_y: 6  # Height of the grid
+  num_boxes: 1  # Number of boxes to push
+  max_steps: 100  # Maximum steps allowed
+  search_depth: 10  # Optional: Search depth for environment generation
+  grid_lookup: {0: "W", 1: ".", 2: "G", 3: "C", 4: "B", 5: "A", 6: "@"}  # Optional: Custom grid representation
+  grid_vocab: {"W": "wall", ".": "empty", "G": "target", "C": "box on target", "B": "box", "A": "player", "@": "player on target"}  # Optional: Custom grid vocabulary
+  render_mode: "rgb_array"  # Optional: For visual rendering
+```
+
+##### Bandit Environment
+```yaml
+env_config:
+  lo_arm_name: "Phoenix"  # Name of the low-reward arm
+  hi_arm_name: "Dragon"   # Name of the high-reward arm
+```
+
+### Using Custom Environments
+
+To use a custom environment in your training:
+
+1. Define the environment in `config/envs.yaml`
+2. Reference it in your training configuration:
+```yaml
+es_manager:
+  train:
+    env_configs:
+      tags: ["SimpleSokoban"]  # Use the environment name defined in envs.yaml
+      n_groups: [8]  # Number of environment instances
+```
