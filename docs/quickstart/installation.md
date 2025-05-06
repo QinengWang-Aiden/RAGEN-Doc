@@ -22,7 +22,7 @@ We also provide manual installation command lines. If `setup_ragen.sh` fails, yo
 
 #### Manual Scripts to Setup Environment
 ```bash
-conda create -n ragen python=3.9 -y
+conda create -n ragen python=3.12 -y
 conda activate ragen
 
 
