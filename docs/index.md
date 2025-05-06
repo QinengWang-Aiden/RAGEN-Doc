@@ -2,7 +2,7 @@
 
 ## 🚀 Introduction
 
-**RAGEN** (Reinforcement learning AGENt) is the a reproduction of the **DeepSeek-R1(-Zero)** framework for *training agentic models* building on top of [`verl`](https://github.com/volcengine/verl).
+**RAGEN** (Reinforcement learning AGENt) is a reproduction of the **DeepSeek-R1(-Zero)** framework for *training agentic models* building on top of [`verl`](https://github.com/volcengine/verl).
 
 ### Key Features
 
@@ -12,21 +12,29 @@
 
 ## 📚 Documentation Structure
 
+### Updates
+- [Updates](updates.md): Our latest updates and changelog
+
 ### Quick Start
 - [Installation](quickstart/installation.md): Get RAGEN up and running
 - [Quick Start Guide](quickstart/quick_start.md): Your first steps with RAGEN
 
 ### Configurations
-- [Config Explanation](configurations/config_exp.md): Understanding RAGEN's configuration system
 - [Practical Usage Config Flow](configurations/config_flow.md): Understand how configs are passed from command lines to the training script
+- [Config Explanation](configurations/config_exp1.md): Understanding RAGEN's configuration system
+
 
 ### Practical Guide
 - [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
+- [FAQ](practical_guide/faq.md): Frequently asked questions and solutions
 
 #### Examples
 - [Sokoban](practical_guide/examples/sokoban.md): Complex puzzle environment
 - [Bi-arm Bandit](practical_guide/examples/bi_arm_bandit.md): Classic exploration vs exploitation
 - [FrozenLake](practical_guide/examples/frozenlake.md): Grid-world environment example
+
+### Appendix
+- [Appendix](appendix.md): Results, features, and other supplementary materials.
 
 ## 🤝 Contributing
 

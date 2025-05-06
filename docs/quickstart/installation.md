@@ -12,8 +12,13 @@ git clone https://github.com/ZihanWang314/RAGEN.git
 
 # Change directory to RAGEN
 cd RAGEN
+
+# Setup and download the dataset
 bash scripts/setup_ragen.sh
 ```
+
+### Note
+If `setup_ragen.sh` fails, you can follow the manual setup instructions in `scripts/setup_ragen.md`.
 
 ### Install from source
 We also provide manual installation command lines. We recommend you to use **Conda** for environment management:
@@ -49,30 +54,13 @@ pip3 install flash-attn --no-build-isolation
 # Install remaining requirements
 pip install -r requirements.txt
 ```
-### Install from PyPI
-To be added in the future.
-### Install from Docker
-To be added in the future.
 
 ## Dataset
 If you would like to test on our agent environments ([Sokoban](../practical_guide/examples/sokoban.md), [Bi-arm bandit](../practical_guide/examples/bi_arm_bandit.md), [frozenlake](../practical_guide/examples/frozenlake.md)), you can either download the dataset from our repository or prepare using our script.
 ### Download the dataset
-You can run the following command to download the dataset (~ 7MB):
+Notice that `setup_ragen.sh` will automatically download the dataset for you. You can also run the following command manually to download the dataset (~ 7MB):
 ```bash
 # Download the dataset
 # This will download the dataset to the `data` directory
 python scripts/download_dataset.py
-```
-### Prepare your own dataset
-We provide a script to prepare your own dataset. You can use the following command to prepare the dataset:
-```bash
-# Prepare the dataset
-# This will prepare the dataset in the `data` directory
-python scripts/create_data.sh
-```
-For better customization, you can also use the following command to prepare the full dataset:
-```bash
-# Prepare the dataset
-# This will prepare the dataset in the `data` directory
-python scripts/create_data_full.sh
 ```

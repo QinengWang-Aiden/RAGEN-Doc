@@ -1,20 +1,24 @@
-# Practical Usage Config Flow
-This document explains how configuration parameters flow through the `RAGEN` training system, from initial YAML file `config/base.yaml` to the final `verl` PPO trainer execution.
+# Config Flow
+This document explains how configuration parameters flow through the `RAGEN` training system, from initial YAML file `config/base.yaml` to the final trainer execution.
 
 ## System Flow Diagram
 
 ```mermaid
-flowchart LR
-    %% Main components
-    A[train.sh] -->|Environment & Args| C[ragen/train.py]
-    B[(base.yaml)] -->|Load Base Config| C
-    D[(env_name.yaml)] -->|Load Env Config| C
-    C -->|Deep Update| E{Config Merger}
-    F[Command Line Args] -->|Override| E
-    I[(ppo_trainer.yaml)] -->|Load| J(("Merge"))
-    E -->|Override| J
-    J -->|Final Config| G[verl/trainer/main_ppo.py]
-    G -->|Initialize| H[PPO Trainer]
+flowchart TD
+    %% Main entry point
+    A[train.py] -->|Load Config| B[Command Line Args] -->|Override| C{Config Merger}
+    
+    %% Config hierarchy
+    D[(env_name.yaml)] -->|Load| C
+    E[(base.yaml)] -->|Load| D
+    F[(ppo_trainer.yaml)] -->|Symbolic Link| E
+    G[(envs.yaml)] -->|Symbolic Link| E
+    
+    %% Training flow
+    C -->|Final Config| H[RayAgentTrainer]
+    H -->|Initialize| I[VerlRayTrainer]
+    I -->|Distributed Training| J[Ray Cluster]
+    J -->|Training| K[Ray Workers]
 
     %% Styling to match site theme
     classDef default fill:#ffffff,stroke:#00897B,stroke-width:1px
@@ -23,15 +27,14 @@ flowchart LR
     classDef process fill:#ffffff,stroke:#00897B,stroke-width:1px
     classDef merger fill:#ffffff,stroke:#00897B,stroke-width:2px,stroke-dasharray: 5 5
     classDef trainer fill:#e8f5e9,stroke:#00897B,stroke-width:1px
-    classDef mergePoint fill:#ffffff,stroke:#00897B,stroke-width:1px
+    classDef ray fill:#e8f5e9,stroke:#00897B,stroke-width:1px,stroke-dasharray: 2 2
 
     %% Apply styles
-    class A,G script
-    class B,D,I config
-    class C process
-    class E merger
-    class F,H default
-    class J mergePoint
+    class A,B script
+    class D,E,F,G config
+    class C merger
+    class H,I trainer
+    class J,K ray
     
     %% Layout adjustments
     linkStyle default stroke:#00897B,stroke-width:1px
@@ -39,135 +42,164 @@ flowchart LR
 
 ## Overview
 
-The configuration flow follows this sequence:
-1. Base configuration loading from YAML files
-2. Command-line parameter overrides
-3. Environment-specific configuration merging
-4. Final parameter propagation to the PPO trainer
+The configuration flow in RAGEN follows the structure below:
+
+1. Base Configuration Loading  
+    - Loads default settings from `config/base.yaml`
+
+2. Task-Specific Configuration  
+    - Loads task-specific settings (e.g., `config/_2_sokoban.yaml`)
+
+3. Command-Line Parameter Overrides  
+    - Allows parameter overrides through command-line arguments
+
+4. Configuration Merging  
+    - Merges configurations following priority: command-line > task-specific > base
+
+5. Training Initialization  
+    - Passes final configuration to training components
+
+For detailed information about configuration sources and parameters, see the [Configuration Sources](#configuration-sources) and [Config Explanation](config_exp.md) section.
 
 ## Configuration Sources
 
 ### 1. YAML Configuration Files
 
-The system uses two primary YAML configuration files:
-- `config/base.yaml`: Contains default configurations
-- `config/{env_name}.yaml`: Environment-specific configurations (e.g., `config/sokoban.yaml`)
+The system uses a hierarchical configuration system with the following YAML files:
+
+- `config/base.yaml`: The base configuration file that includes symbolic links to:
+    - `config/ppo_trainer.yaml`: Training algorithm configurations
+    - `config/envs.yaml`: Environment-specific configurations
+- `config/{env_name}.yaml`: Task-specific configurations (e.g., `config/_2_sokoban.yaml`)
+
+The configuration inheritance follows this order:
+
+1. `base.yaml` loads configurations from `ppo_trainer.yaml` and `envs.yaml`
+2. Environment-specific YAML files inherit from `base.yaml`
+3. Command line arguments can override any configuration from the YAML files, see the example at [Command-Line Arguments](#command-line-arguments)
 
 ### 2. Command-Line Arguments
 
-Configuration parameters can be overridden via command-line arguments in the `train.sh` script. For example:
+Configuration parameters can be overridden via command-line arguments when running `train.py`. The system supports both PPO and GRPO algorithms， for example:
 
 ```bash
-bash train.sh sokoban \
-    model.base_model=Qwen/Qwen2.5-7B-Instruct \
-    model.experiment_name=sokoban_7B_instruct_ragen_main \
-    training.train_batch_size=4 \
-    training.max_turns=5 \
-    training.n_rollout=8 \
-    training.micro_batch_size=4 \
-    training.ppo_batch_size=32 \
-    optimization.kl_coef=0.001 \
-    optimization.adv_estimator=brpo
+python train.py --config-name _2_sokoban \
+    system.CUDA_VISIBLE_DEVICES="0" \
+    trainer.experiment_name=sokoban-grpo \
+    algorithm.adv_estimator=grpo \
+    algorithm.kl_ctrl.kl_coef=0.001 \
+    actor_rollout_ref.actor.use_kl_loss=True \
+    actor_rollout_ref.actor.kl_loss_coef=0.001 \
+    actor_rollout_ref.actor.clip_ratio_high=0.2 \
+    actor_rollout_ref.rollout.rollout_filter_ratio=1
 ```
 
 ## Configuration Flow Process
 
-### 1. Initial Configuration Loading
+### 1. Base Configuration Loading
 
-When `train.sh` is executed, it triggers the following process:
+The process starts with loading the base configuration:
 
-1. `train.sh` calls `ragen/train.py` with the environment name and overrides:
-```bash
-python ragen/train.py "$ENV_NAME" "$@" | bash
-```
-
-2. `train.py` loads the base configuration:
 ```python
-def load_config(env_name: str):
-    with open("config/base.yaml", 'r') as f:
-        config = yaml.safe_load(f)
+@hydra.main(version_base=None, config_path="config", config_name="base")
+def main(config):
+    config = add_dependency(config)
+    run_ppo(config)
 ```
 
-### 2. Configuration Merging
+- `base.yaml` is loaded as the foundation
+- It includes symbolic links to `ppo_trainer.yaml` and `envs.yaml`
+- Basic system settings like GPU allocation are initialized
 
-The system then merges configurations in this order:
+### 2. Task-Specific Configuration
 
-1. Base configuration (`base.yaml`)
-2. Environment-specific configuration (`{env_name}.yaml`)
-3. Command-line overrides
+Task-specific configurations are loaded based on the environment:
 
-The merging process uses a deep update strategy:
 ```python
-def deep_update(base_dict, update_dict):
-    for key, value in update_dict.items():
-        if isinstance(value, dict):
-            base_dict[key] = deep_update(base_dict[key], value)
-        else:
-            base_dict[key] = value
-    return base_dict
+python train.py --config-name _2_sokoban
 ```
 
-### 3. Parameter Translation
+- Task-specific settings (e.g., `_2_sokoban.yaml`) are loaded
+- These configurations inherit from `base.yaml`.
 
-After merging, `train.py` translates the configuration into PPO trainer parameters. This happens in the `get_train_command()` function, which generates a complete command string for the PPO trainer.
+### 3. Command-Line Parameter Overrides
 
-Key parameter transformations include:
+Command-line arguments can override any configuration:
 
-1. Model Configuration:
 ```python
-f"actor_rollout_ref.model.path={config['model']['base_model']}"
-f"actor_rollout_ref.model.enable_gradient_checkpointing={config['model']['gradient_checkpointing']}"
+python train.py --config-name _2_sokoban \
+    system.CUDA_VISIBLE_DEVICES="0" \
+    trainer.experiment_name=sokoban-grpo \
+    algorithm.adv_estimator=grpo
 ```
 
-2. Training Parameters:
+### 4. Configuration Merging
+
+The system merges configurations following priority:
+
 ```python
-f"data.train_batch_size={config['training']['train_batch_size']}"
-f"actor_rollout_ref.actor.ppo_batch_size={config['training']['ppo_batch_size']}"
+config = add_dependency(config)
 ```
 
-3. Optimization Settings:
+1. Command-line arguments (highest)
+2. Task-specific configuration
+3. Base configuration (lowest)
+
+The merging process:
+
+- Uses Hydra's configuration system
+- Preserves nested structure
+- Handles symbolic links and variable interpolation
+
+### 5. Training Initialization
+
+The final configuration is passed to training components:
+
 ```python
-f"actor_rollout_ref.actor.optim.lr={config['optimization']['actor_lr']}"
-f"actor_rollout_ref.actor.kl_loss_coef={config['optimization']['kl_coef']}"
+def run_ppo(config) -> None:
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config.system.CUDA_VISIBLE_DEVICES)
+    runner = TaskRunner.remote()
+    ray.get(runner.run.remote(config))
 ```
-
-### 4. Final Execution
-
-The translated command is then executed by the shell, launching the PPO trainer (`verl/trainer/main_ppo.py`) with all configured parameters.
-
-## Parameter Override Hierarchy
-
-The system follows this override hierarchy (later items take precedence):
-
-1. Default values in `base.yaml`
-2. Environment-specific values in `{env_name}.yaml`
-3. Environment variables (prefixed with `CONFIG_`)
-4. Command-line arguments
 
 ## Example Configuration Flow
 
 Let's trace how a specific parameter flows through the system:
 
-1. Starting with `train.sh`:
+1. Starting with `train.py` and command-line arguments:
 ```bash
-bash train.sh sokoban training.train_batch_size=4
+python train.py --config-name _2_sokoban \
+    system.CUDA_VISIBLE_DEVICES="0" \
+    trainer.experiment_name=sokoban-grpo \
+    algorithm.adv_estimator=grpo \
+    actor_rollout_ref.actor.micro_batch_size_per_gpu=4
 ```
 
-2. This is passed to `train.py`, which:
-   - Loads base configuration from `base.yaml`
-   - Loads Sokoban-specific configuration
-   - Applies the command-line override for `train_batch_size`
+2. The configuration system:
 
-3. Finally, it's translated to the PPO trainer parameter:
-```bash
-python -m verl.trainer.main_ppo \
-    data.train_batch_size=4 \
-    # ... other parameters
+    - Loads base configuration from `base.yaml`, which includes symbolic links to `ppo_trainer.yaml` and `envs.yaml`
+    - Loads Sokoban-specific configuration from `_2_sokoban.yaml`
+    - Applies the command-line overrides, including the batch size setting
+
+3. The final configuration is used to initialize the training components:
+```python
+# In train.py
+@hydra.main(version_base=None, config_path="config", config_name="base")
+def main(config):
+    config = add_dependency(config)
+    run_ppo(config)
+
+# In RayAgentTrainer
+def __init__(self, config, tokenizer, role_worker_mapping, resource_pool_manager, ...):
+    super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ...)
+    self.config = config  # Contains the final merged configuration
 ```
 
-## Best Practices
-
-1. Always specify critical parameters in YAML files rather than relying on command-line overrides for better reproducibility.
-2. Use environment-specific YAML files for parameters that are consistent across runs for that environment.
-3. Use command-line overrides for experimental variations or one-off changes.
-4. Document any non-standard parameter combinations in experiment logs.
+4. The batch size parameter is then used in various components:
+```python
+# In RayAgentTrainer
+def _create_dataloader(self):
+    # Uses config.actor_rollout_ref.actor.micro_batch_size_per_gpu
+    # for creating the data loader
+    self.config.actor_rollout_ref.actor.micro_batch_size_per_gpu = config.micro_batch_size_per_gpu
+```
