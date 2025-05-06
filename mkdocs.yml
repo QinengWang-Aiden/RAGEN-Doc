@@ -36,7 +36,7 @@ nav:
     - Installation: quickstart/installation.md
     - Quick Start Guide: quickstart/quick_start.md
   - Configurations:
-    - Config Flow: configurations/config_flow.md
+    # - Config Flow: configurations/config_flow.md
     - Config Explanation: configurations/config_exp1.md
   - Practical Guide:
     - Best Practices: practical_guide/best_practices.md
