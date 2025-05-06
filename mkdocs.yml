@@ -31,18 +31,21 @@ theme:
 
 nav:
   - Home: index.md
+  - Updates: updates.md
   - Quick Start:
     - Installation: quickstart/installation.md
     - Quick Start Guide: quickstart/quick_start.md
   - Configurations:
-    - Config Explanation: configurations/config_exp.md
-    - Practical Usage Config Flow: configurations/config_flow.md
+    - Config Flow: configurations/config_flow.md
+    - Config Explanation: configurations/config_exp1.md
   - Practical Guide:
     - Best Practices: practical_guide/best_practices.md
+    - FAQ: practical_guide/faq.md
     - Examples:
       - Sokoban: practical_guide/examples/sokoban.md
       - Bi-arm Bandit: practical_guide/examples/bi_arm_bandit.md
       - FrozenLake: practical_guide/examples/frozenlake.md
+  - Appendix: appendix.md
 
 # Plugin Configuration
 plugins:
