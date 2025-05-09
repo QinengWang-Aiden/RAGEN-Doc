@@ -25,36 +25,33 @@ micro_batch_size_per_gpu: 4
 ppo_mini_batch_size: 32
 model_path: Qwen/Qwen2.5-0.5B-Instruct
 enable_response_mask: True
-grpo_advantage_length_weight: False
 ```
 
 - `micro_batch_size_per_gpu`: Batch size for each GPU during training
 - `ppo_mini_batch_size`: Batch size for PPO policy updates
 - `model_path`: Base model to use for training
 - `enable_response_mask`: Whether to enable response masking for improved stability in rollout/old_log_prob calculations
-- `grpo_advantage_length_weight`: Whether to weight advantages by length in GRPO, useful when critic/advantages/mean is too low
 
 ### LoRA Settings
 ```yaml
 lora:
-  enabled: False
-  rank: 64
-  alpha: 64
+  rank: 0
+  alpha: 16
   target_modules: all-linear
-  local_temp_dir: lora_temp
 ```
 
-- `lora.enabled`: Whether to use LoRA for efficient fine-tuning
-- `lora.rank`: Rank of LoRA adaptation
+- `lora.rank`: Rank of LoRA adaptation, `0` means not using LoRA
 - `lora.alpha`: Alpha parameter for LoRA scaling
 - `lora.target_modules`: Which modules to apply LoRA to (all-linear means all linear layers)
-- `lora.local_temp_dir`: Directory for storing LoRA temporary files
 
 ### Actor-Rollout-Ref Settings
 ```yaml
 actor_rollout_ref:
   model:
     path: ${model_path}
+    lora_rank: ${lora.rank}
+    lora_alpha: ${lora.alpha}
+    target_modules: ${lora.target_modules}
   actor:
     ppo_mini_batch_size: ${ppo_mini_batch_size}  # by default, ppo_mini_batch_size = train_batch_size / 4
     micro_batch_size_per_gpu: ${micro_batch_size_per_gpu} # following micro_batch_size_per_gpu
@@ -66,15 +63,8 @@ actor_rollout_ref:
     kl_loss_type: kl
     clip_ratio_low: 0.2
     clip_ratio_high: 0.28
-    grpo_advantage_length_weight: ${grpo_advantage_length_weight}
     optim:
       betas: [0.9, 0.999]
-    lora:
-      enabled: ${lora.enabled}
-      rank: ${lora.rank}
-      alpha: ${lora.alpha}
-      target_modules: ${lora.target_modules}
-      local_temp_dir: ${lora.local_temp_dir}
   ref:
     log_prob_micro_batch_size_per_gpu: ${micro_batch_size_per_gpu} # following micro_batch_size_per_gpu
   rollout:
@@ -88,21 +78,21 @@ actor_rollout_ref:
     temperature: 1
     rollout_filter_ratio: 0.25
     rollout_filter_type: std # max_mean or std
-    enforce_eager: False #  for small models, set both enforce_eager and free_cache_engine to False to make rollout faster
-    free_cache_engine: False
+    enforce_eager: True #  for small models, set both enforce_eager and free_cache_engine to False to make rollout faster
+    free_cache_engine: True
     val_kwargs:
       do_sample: True
       temperature: 0.5
-    lora:
-      enabled: ${lora.enabled}
-      rank: ${lora.rank}
-      alpha: ${lora.alpha}
-      target_modules: ${lora.target_modules}
-      local_temp_dir: ${lora.local_temp_dir}
+    tp_size_check: true
 ```
 
 #### Model Settings
 - `actor_rollout_ref.model.path`: Path to the base model, inherited from the global `model_path` setting. 
+lora
+- `actor_rollout_ref.model.lora_rank`: Rank of LoRA adaptation for the actor. Inherited from global LoRA settings.
+- `actor_rollout_ref.model.lora_alpha`: Alpha parameter for LoRA scaling in the actor. Inherited from global LoRA settings.
+- `actor_rollout_ref.model.lora_target_modules`: Which modules to apply LoRA to in the actor. Inherited from global LoRA settings.
+
 #### Actor Settings
 - `actor_rollout_ref.actor.ppo_mini_batch_size`: Batch size for PPO policy updates. By default, this is set to train_batch_size/4 to ensure stable training.
 - `actor_rollout_ref.actor.micro_batch_size_per_gpu`: Batch size for each GPU during actor forward passes. This is synchronized with the global micro_batch_size_per_gpu setting.
@@ -114,15 +104,7 @@ actor_rollout_ref:
 - `actor_rollout_ref.actor.kl_loss_type`: Type of KL divergence calculation. Currently set to 'kl' for standard KL divergence.
 - `actor_rollout_ref.actor.clip_ratio_low`: Lower bound for PPO clip ratio. Actions with probability ratios below this value will be clipped.
 - `actor_rollout_ref.actor.clip_ratio_high`: Upper bound for PPO clip ratio. Actions with probability ratios above this value will be clipped.
-- `actor_rollout_ref.actor.grpo_advantage_length_weight`: Whether to weight advantages by sequence length in GRPO. This is inherited from the global setting.
 - `actor_rollout_ref.actor.optim.betas`: Beta parameters for the Adam optimizer. [0.9, 0.999] are the default values for Adam.
-
-#### Actor LoRA Settings
-- `actor_rollout_ref.actor.lora.enabled`: Whether to use LoRA for the actor model. Inherited from global LoRA settings.
-- `actor_rollout_ref.actor.lora.rank`: Rank of LoRA adaptation for the actor. Inherited from global LoRA settings.
-- `actor_rollout_ref.actor.lora.alpha`: Alpha parameter for LoRA scaling in the actor. Inherited from global LoRA settings.
-- `actor_rollout_ref.actor.lora.target_modules`: Which modules to apply LoRA to in the actor. Inherited from global LoRA settings.
-- `actor_rollout_ref.actor.lora.local_temp_dir`: Directory for storing actor's LoRA temporary files. Inherited from global LoRA settings.
 
 #### Reference Policy Settings
 - `actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu`: Batch size for computing log probabilities with the reference policy. Synchronized with the global micro_batch_size_per_gpu setting.
@@ -140,17 +122,11 @@ actor_rollout_ref:
 - `actor_rollout_ref.rollout.rollout_filter_type`: Type of filtering to apply to rollouts. 'std' uses standard deviation, 'max_mean' uses maximum mean.
 - `actor_rollout_ref.rollout.enforce_eager`: Whether to enforce eager execution mode. Set to False for small models to improve rollout speed.
 - `actor_rollout_ref.rollout.free_cache_engine`: Whether to free the cache engine after each rollout. Set to False for small models to improve speed.
+- `actor_rollout_ref.rollout.tp_size_check`: Whether to enable tensor parallelism size checking. Set to true to verify that the tensor parallelism configuration matches the model's requirements.
 
 #### Rollout Validation Settings
 - `actor_rollout_ref.rollout.val_kwargs.do_sample`: Whether to use sampling during validation. 
 - `actor_rollout_ref.rollout.val_kwargs.temperature`: Temperature for validation generation. 
-
-#### Rollout LoRA Settings
-- `actor_rollout_ref.rollout.lora.enabled`: Whether to use LoRA during rollouts. 
-- `actor_rollout_ref.rollout.lora.rank`: Rank of LoRA adaptation for rollouts.
-- `actor_rollout_ref.rollout.lora.alpha`: Alpha parameter for LoRA scaling in rollouts. 
-- `actor_rollout_ref.rollout.lora.target_modules`: Which modules to apply LoRA to during rollouts. 
-- `actor_rollout_ref.rollout.lora.local_temp_dir`: Directory for storing rollout's LoRA temporary files.
 
 ### Critic Settings
 ```yaml
@@ -393,3 +369,10 @@ es_manager:
       tags: ["SimpleSokoban"]  # Use the environment name defined in envs.yaml
       n_groups: [8]  # Number of environment instances
 ```
+
+## Best Practices
+
+1. Always specify critical parameters in YAML files rather than relying on command-line overrides for better reproducibility.
+2. Use environment-specific YAML files for parameters that are consistent across runs for that environment.
+3. Use command-line overrides for experimental variations or one-off changes.
+4. Document any non-standard parameter combinations in experiment logs.

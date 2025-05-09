@@ -23,18 +23,13 @@
 <!-- - [Practical Usage Config Flow](configurations/config_flow.md): Understand how configs are passed from command lines to the training script -->
 - [Config Explanation](configurations/config_exp1.md): Understanding RAGEN's configuration system
 
-
-### Practical Guide
-- [Best Practices](practical_guide/best_practices.md): Tips and recommendations for optimal usage
-- [FAQ](practical_guide/faq.md): Frequently asked questions
-
 #### Examples
 - [Sokoban](practical_guide/examples/sokoban.md): Complex puzzle environment
 - [Bi-arm Bandit](practical_guide/examples/bi_arm_bandit.md): Classic exploration vs exploitation
 - [FrozenLake](practical_guide/examples/frozenlake.md): Grid-world environment example
 
-### Appendix
-- [Appendix](appendix.md): Results, features, and other supplementary materials.
+<!-- ### Appendix
+- [Appendix](appendix.md): Results, features, and other supplementary materials. -->
 
 ## 🤝 Contributing
 
