@@ -46,7 +46,9 @@ For the rule-based reward, we apply -1 as the penalty for the invalid response f
 ### Training Script
 You can perform PPO training with the following command:
 ```bash
-python train.py --config-name _2_sokoban trainer.experiment_name=sokoban-ppo # run ppo by default
+# run ppo by default
+python train.py 
+# if you want to use other environments, override the config-name
 ```
 We provide a set of standard experiments in the file `train_all.sh`.
 You can also override the default configuration by passing arguments to the `train.py` script. Below is a simple example command:
@@ -56,11 +58,10 @@ You can also override the default configuration by passing arguments to the `tra
 # You can also find this example in `train_all.sh`
 
 python train.py \
-    --config-name _2_sokoban \
     trainer.experiment_name=sokoban-ppo-rolloutfilter0.25 \
     actor_rollout_ref.rollout.rollout_filter_ratio=0.25
 ```
 
-Besides overriding parameters via command line arguments, you can also modify the configuration directly in the YAML files. For example, you can edit `config/base.yaml` to change the default parameters for your experiments, or create new customs environment settings at `config/envs.yaml`. This approach is particularly useful when you want to maintain different configurations for various experimental setups.
+Besides overriding parameters via command line arguments, you can also modify the configuration directly in the YAML files. For example, you can edit `config/base.yaml` to change the default parameters for your experiments, or create new custom environment settings at `config/envs.yaml`. This approach is particularly useful when you want to maintain different configurations for various experimental setups.
 
 For more detailed configuration keys and how to customize your environments, please refer to the [Config Explanation](../configurations/config_exp.md) page.
